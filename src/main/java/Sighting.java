@@ -1,4 +1,6 @@
 import java.sql.Timestamp;
+import java.util.List;
+import org.sql2o.*;
 
 public class Sighting {
     private int id;
