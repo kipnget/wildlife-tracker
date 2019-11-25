@@ -73,4 +73,6 @@ public class EndangeredAnimalTest {
         EndangeredAnimal savedAnimal = EndangeredAnimal.find(testAnimal.getId());
         assertEquals("Panda", savedAnimal.getName());
     }
+
+
 }

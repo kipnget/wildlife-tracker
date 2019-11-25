@@ -1,4 +1,7 @@
-ublic class EndangeredAnimal {
+import org.sql2o.*;
+import java.util.List;
+
+public class EndangeredAnimal extends Animal implements DatabaseManagement {
     private double age;
     private String health;
     public static final String DATABASE_TYPE = "endangered_animal";
@@ -30,5 +33,38 @@ ublic class EndangeredAnimal {
 
     public void setHealth(String health) {
         this.health = health;
+    }
+
+    @Override
+    public void save() {
+        if (Animal.nameExists(this.name, this.id)) {
+            throw new IllegalArgumentException("Error: Name already exists.");
+        } else {
+            try(Connection con = DB.sql2o.open()) {
+                String sql = "INSERT INTO animals (name, type, age, health) VALUES (:name, :type, :age, :health);";
+                this.id = (int) con.createQuery(sql, true)
+                        .addParameter("name", this.name)
+                        .addParameter("age", this.age)
+                        .addParameter("health", this.health)
+                        .addParameter("type", DATABASE_TYPE)
+                        .executeUpdate()
+                        .getKey();
+            }
+        }
+    }
+    public void update() {
+        if (Animal.nameExists(this.name, this.id)) {
+            throw new IllegalArgumentException("Error: Name already exixts.");
+        } else {
+            try(Connection con = DB.sql2o.open()) {
+                String sql = "UPDATE animals SET name = :name, age = :age, health = :health WHERE id = :id;";
+                con.createQuery(sql)
+                        .addParameter("id", this.id)
+                        .addParameter("name", this.name)
+                        .addParameter("age", this.age)
+                        .addParameter("health", this.health)
+                        .executeUpdate();
+            }
+        }
     }
 }
