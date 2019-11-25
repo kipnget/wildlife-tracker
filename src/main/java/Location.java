@@ -1,4 +1,4 @@
-public class Location {
+public abstract class Location implements DatabaseManagement {
     private int id;
     private String name;
     private double xCoord;
