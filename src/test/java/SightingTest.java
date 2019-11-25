@@ -1,6 +1,9 @@
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.*;
+import static org.junit.Assert.*;
+import java.util.Arrays;
 
 import java.sql.Timestamp;
 
