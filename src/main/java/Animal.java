@@ -1,5 +1,5 @@
-import org.sql2o.Connection;
 import java.util.List;
+import org.sql2o.*;
 
 public abstract class Animal implements DatabaseManagement {
     protected int id;
@@ -16,7 +16,7 @@ public abstract class Animal implements DatabaseManagement {
     }
 
     public void setName(String name) {
-        if (DatabaseManagement.nameValidation(name)) {
+        if(DatabaseManagement.nameValidation(name)) {
             this.name = name;
         }
     }
@@ -51,4 +51,48 @@ public abstract class Animal implements DatabaseManagement {
         return count != 0;
     }
 
+    public static boolean idExists(int id) {
+        Integer count = 0;
+        try(Connection con = DB.sql2o.open()) {
+            String sql = "SELECT count(id) FROM animals WHERE id = :id;";
+            count = con.createQuery(sql)
+                    .throwOnMappingFailure(false)
+                    .addParameter("id", id)
+                    .executeScalar(Integer.class);
+        }
+        return count != 0;
+    }
+
+    public static String getAnimalType(int id) {
+        String type;
+        try(Connection con = DB.sql2o.open()) {
+            String sql = "SELECT type FROM animals WHERE id = :id;";
+            type = con.createQuery(sql)
+                    .throwOnMappingFailure(false)
+                    .addParameter("id", id)
+                    .executeScalar(String.class);
+        }
+        return type;
+    }
+
+    public static String getAnimalName(int id) {
+        String name;
+        try(Connection con = DB.sql2o.open()) {
+            String sql = "SELECT name FROM animals WHERE id = :id;";
+            name = con.createQuery(sql)
+                    .throwOnMappingFailure(false)
+                    .addParameter("id", id)
+                    .executeScalar(String.class);
+        }
+        return name;
+    }
+
+    public void delete() {
+        try(Connection con = DB.sql2o.open()) {
+            String sql = "DELETE FROM animals WHERE id = :id;";
+            con.createQuery(sql)
+                    .addParameter("id", this.id)
+                    .executeUpdate();
+        }
+    }
 }
