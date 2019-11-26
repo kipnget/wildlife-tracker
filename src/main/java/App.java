@@ -13,6 +13,18 @@ public class App {
     private static Map<String, Object> model;
 
     public static void main(String[] args) {
+
+        ProcessBuilder process = new ProcessBuilder();
+        Integer port;
+
+        if (process.environment().get("PORT") != null) {
+            port = Integer.parseInt(process.environment().get("PORT"));
+        } else {
+            port = 4567;
+        }
+
+        port(port);
+
         staticFileLocation("/public");
         String layout = "templates/layout.vtl";
         model = new HashMap<String, Object>();
@@ -35,7 +47,7 @@ public class App {
         }, new VelocityTemplateEngine());
 
         // Animal
-        get("/templates/animals", (request, response) -> {
+        get("/animals", (request, response) -> {
             model.put("regularanimals", RegularAnimal.all());
             model.put("endangeredanimals", EndangeredAnimal.all());
             model.put("template", "templates/animals/index.vtl");
@@ -47,7 +59,7 @@ public class App {
             return new ModelAndView(model, layout);
         }, new VelocityTemplateEngine());
 
-        get("/templates/animals/edit/:id", (request, response) -> {
+        get("/animals/edit/:id", (request, response) -> {
             Animal animal = tryFindAnimal(request.params(":id"));
             if(animal == null) {
                 response.redirect("/");
@@ -58,18 +70,18 @@ public class App {
             return new ModelAndView(model, layout);
         }, new VelocityTemplateEngine());
 
-        get("/templates/animals/delete/:id", (request, response) -> {
+        get("/animals/delete/:id", (request, response) -> {
             Animal animal = tryFindAnimal(request.params(":id"));
             if(animal == null) {
                 response.redirect("/");
             } else {
                 model.put("animal", animal);
             }
-            model.put("template", "templates/animals/delete.vtl");
+            model.put("template", "/templates/animals/delete.vtl");
             return new ModelAndView(model, layout);
         }, new VelocityTemplateEngine());
 
-        get("/templates/animals/search", (request, response) -> {
+        get("/animals/search", (request, response) -> {
             if(request.queryParams("s") != null) {
                 String search = request.queryParams("s");
                 model.put("endangeredanimals", EndangeredAnimal.search(search));
@@ -80,7 +92,7 @@ public class App {
             return new ModelAndView(model, layout);
         }, new VelocityTemplateEngine());
 
-        get("/templates/animals/:id", (request, response) -> {
+        get("/animals/:id", (request, response) -> {
             Animal animal = tryFindAnimal(request.params(":id"));
             if(animal == null) {
                 response.redirect("/");
@@ -91,7 +103,7 @@ public class App {
             return new ModelAndView(model, layout);
         }, new VelocityTemplateEngine());
 
-        post("/templates/animals", (request, response) -> {
+        post("/animals", (request, response) -> {
             String type = request.queryParams("type");
             String name = request.queryParams("name");
             if(type.equals(EndangeredAnimal.DATABASE_TYPE)) {
@@ -101,17 +113,17 @@ public class App {
                     EndangeredAnimal animal = new EndangeredAnimal(name, age, health);
                     animal.save();
                 } catch (IllegalArgumentException e) {
-                    response.redirect("/templates/animals");
+                    response.redirect("/animals");
                 }
             } else {
                 RegularAnimal animal = new RegularAnimal(name);
                 animal.save();
             }
-            response.redirect("/templates/animals");
+            response.redirect("/animals");
             return new ModelAndView(model, layout);
         }, new VelocityTemplateEngine());
 
-        post("/templates/animals/edit", (request, response) -> {
+        post("/animals/edit", (request, response) -> {
             int id = tryParseInt(request.queryParams("id"));
             String type = request.queryParams("type");
             String name = request.queryParams("name");
@@ -125,7 +137,7 @@ public class App {
                     animal.setAge(age);
                     animal.update();
                 } catch (IllegalArgumentException e) {
-                    response.redirect("/templates/animals");
+                    response.redirect("/animals");
                 }
             } else {
                 try {
@@ -133,19 +145,19 @@ public class App {
                     animal.setName(name);
                     animal.update();
                 } catch (IllegalArgumentException e) {
-                    response.redirect("/templates/animals");
+                    response.redirect("/animals");
                 }
             }
-            response.redirect("/templates/animals");
+            response.redirect("/animals");
             return new ModelAndView(model, layout);
         }, new VelocityTemplateEngine());
 
-        post("/templates/animals/delete", (request, response) -> {
+        post("/animals/delete", (request, response) -> {
             Animal animal = tryFindAnimal(request.queryParams("animalId"));
             if(animal != null) {
                 animal.delete();
             }
-            response.redirect("/templates/animals");
+            response.redirect("/animals");
             return new ModelAndView(model, layout);
         }, new VelocityTemplateEngine());
 
@@ -179,7 +191,7 @@ public class App {
             } else {
                 model.put("location", location);
             }
-            model.put("template", "templates/locations/delete.vtl");
+            model.put("template", "/locations/delete.vtl");
             return new ModelAndView(model, layout);
         }, new VelocityTemplateEngine());
 
@@ -189,7 +201,7 @@ public class App {
                 model.put("locations", Location.search(search));
                 model.put("search", search);
             }
-            model.put("template", "templates/locations/search.vtl");
+            model.put("template", "/locations/search.vtl");
             return new ModelAndView(model, layout);
         }, new VelocityTemplateEngine());
 
@@ -285,7 +297,7 @@ public class App {
                 model.put("rangers", Ranger.search(search));
                 model.put("search", search);
             }
-            model.put("template", "templates/rangers.search.vtl");
+            model.put("template", "templates/rangers/search.vtl");
             return new ModelAndView(model, layout);
         }, new VelocityTemplateEngine());
 

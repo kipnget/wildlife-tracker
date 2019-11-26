@@ -8,6 +8,7 @@ version '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 mainClassName = 'App'
+applicationName = "wildlife-tracker"
 
 repositories {
     mavenCentral()
@@ -26,3 +27,5 @@ dependencies {
     compile group: 'org.apache.velocity', name: 'velocity', version: '1.7'
     compile group: 'org.apache.velocity', name: 'velocity-tools', version: '2.0'
 }
+
+task stage(dependsOn: ['clean', 'installDist'])
